@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Docu.Documentation;
 using Docu.Documentation.Comments;
@@ -70,7 +71,7 @@ namespace Docu.Tests.Documentation.DocumentModelGeneratorTests
             };
             var namespaces = model.Create(members);
 
-            namespaces[0].Types[0].Interfaces.CountShouldEqual(2);
+            namespaces[0].Types[0].Interfaces.Count.ShouldEqual(2);
             namespaces[0].Types[0].Interfaces[0].PrettyName.ShouldEqual("EmptyInterface");
             namespaces[0].Types[0].Interfaces[1].PrettyName.ShouldEqual("IDisposable");
         }
@@ -85,7 +86,7 @@ namespace Docu.Tests.Documentation.DocumentModelGeneratorTests
             };
             var namespaces = model.Create(members);
 
-            namespaces[0].Types[0].Interfaces.CountShouldEqual(0);
+            namespaces[0].Types[0].Interfaces.Count.ShouldEqual(0);
         }
 
         [Test]
@@ -98,7 +99,7 @@ namespace Docu.Tests.Documentation.DocumentModelGeneratorTests
             };
             var namespaces = model.Create(members);
 
-            namespaces[0].Types[0].Interfaces.CountShouldEqual(1);
+            namespaces[0].Types[0].Interfaces.Count.ShouldEqual(1);
             namespaces[0].Types[0].Interfaces[0].PrettyName.ShouldEqual("IExample");
         }
 
@@ -123,9 +124,10 @@ namespace Docu.Tests.Documentation.DocumentModelGeneratorTests
                 Type<Second>(@"<member name=""T:Example.Second""><summary><see cref=""T:Example.First"" /></summary></member>"),  
             };
             var namespaces = model.Create(members);
+            var comment = new List<IComment>(namespaces[0].Types[1].Summary.Children);
 
-            ((See)namespaces[0].Types[1].Summary[0]).Reference.ShouldNotBeNull();
-            ((See)namespaces[0].Types[1].Summary[0]).Reference.IsResolved.ShouldBeTrue();
+            ((See)comment[0]).Reference.ShouldNotBeNull();
+            ((See)comment[0]).Reference.IsResolved.ShouldBeTrue();
         }
 
         [Test]
@@ -134,10 +136,11 @@ namespace Docu.Tests.Documentation.DocumentModelGeneratorTests
             var model = new DocumentModel(new CommentParser(), StubEventAggregator);
             var members = new[] { Type<Second>(@"<member name=""T:Example.Second""><summary><see cref=""T:Example.First"" /></summary></member>") };
             var namespaces = model.Create(members);
+            var comment = new List<IComment>(namespaces[0].Types[0].Summary.Children);
 
-            ((See)namespaces[0].Types[0].Summary[0]).Reference.IsExternal.ShouldBeTrue();
-            ((See)namespaces[0].Types[0].Summary[0]).Reference.Name.ShouldEqual("First");
-            ((See)namespaces[0].Types[0].Summary[0]).Reference.FullName.ShouldEqual("Example.First");
+            ((See)comment[0]).Reference.IsExternal.ShouldBeTrue();
+            ((See)comment[0]).Reference.Name.ShouldEqual("First");
+            ((See)comment[0]).Reference.FullName.ShouldEqual("Example.First");
         }
 
         [Test]
@@ -227,7 +230,7 @@ namespace Docu.Tests.Documentation.DocumentModelGeneratorTests
 
             var method = namespaces[0].Types[1].Methods[0];
 
-            method.Parameters.CountShouldEqual(2);
+            method.Parameters.Count.ShouldEqual(2);
             method.Parameters[0].Name.ShouldEqual("one");
             method.Parameters[0].Reference.IsExternal.ShouldBeTrue();
             method.Parameters[1].Name.ShouldEqual("two");
